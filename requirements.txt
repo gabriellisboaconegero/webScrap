@@ -1,2 +1,11 @@
-beautifulsoup4
-requests
+beautifulsoup4 @ file:///croot/beautifulsoup4-split_1718029820055/work
+Brotli @ file:///croot/brotli-split_1714483155106/work
+certifi @ file:///croot/certifi_1725551672989/work/certifi
+charset-normalizer @ file:///croot/charset-normalizer_1721748349566/work
+idna @ file:///croot/idna_1714398848350/work
+PySocks @ file:///work/perseverance-python-buildout/croot/pysocks_1698845478203/work
+requests @ file:///croot/requests_1721410876868/work
+setuptools==72.1.0
+soupsieve @ file:///work/perseverance-python-buildout/croot/soupsieve_1698866207280/work
+urllib3 @ file:///croot/urllib3_1718912636303/work
+wheel==0.44.0
