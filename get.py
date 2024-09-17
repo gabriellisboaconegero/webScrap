@@ -34,13 +34,13 @@ if __name__ == "__main__":
 
     search = soup.find(id='search')
     links = search.find_all('a')
-    for link in links:
-        print(link['href'])
+    # for link in links:
+    #     print(link['href'])
 
-    # # Pega html do primeiro item da pesquisa
-    # req2 = requests.get(links[0]["href"])
-    # # Sai se requesição não for 200 (OK)
-    # req2.raise_for_status()
-    # soup = BeautifulSoup(req2.text, 'html.parser')
+    # Pega html do primeiro item da pesquisa
+    req2 = requests.get(links[0]["href"])
+    # Sai se requesição não for 200 (OK)
+    req2.raise_for_status()
+    soup = BeautifulSoup(req2.text, 'html.parser')
 
-    # print(soup)
+    print(soup)
