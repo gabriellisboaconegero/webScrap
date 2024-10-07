@@ -74,7 +74,7 @@ parsed_args = parser.parse_args()
 
 
 # ------------------------- Configuração de pesquisa -------------------------
-SEARCH = 'new rtx 5000 series'
+SEARCH = 'google'
 URL = 'https://www.google.com/search'
 
 HEADERS = {
@@ -83,6 +83,7 @@ HEADERS = {
 }
 # ------------------------- Configuração de pesquisa -------------------------
 
+# ------------------------- Configurações de Debug -------------------------
 def debug(func):
     def wrap(*args, **kwargs):
         if parsed_args.debug:
@@ -99,6 +100,8 @@ def debug_print(*args, **kwargs):
 def build_parameters():
     param = {
         'q': SEARCH,
+        # Coloquei 'uk' para ter os mesmos resultados no browser e na saida do script
+        'gl': 'uk',
     }
 
     # 10 é padrão, não precisa colocar
@@ -110,9 +113,43 @@ def build_parameters():
 
     debug_print(f'{param=}')
     return param
+# ------------------------- Configurações de Debug -------------------------
+
 
 def parse_organic_result(og_result):
-    return og_result.find('div', class_='yuRUbf').find('a')
+    # O atributo data-snhf ajuda a dizer qual parte dos ados estamos utilizando
+    # Para achar eu explorei o código html de retorno
+    info_p0 = og_result.select_one('div[data-snhf="0"]')
+    info_p1 = og_result.select_one('div[data-sncf="1"]')
+
+    title = info_p0.find('h3').get_text()
+    url = info_p0.find('a')['href']
+    # Achei qual classes deve ser explorando o html retornado
+    site_name = info_p0.select_one('span.VuuXrf').get_text()
+
+    # Mesma coisa, explorei o html e achei esse caminho para pegar a data
+    date = info_p1.select_one('span.LEwnzc.Sqrs4e')
+    if date != None:
+        date = date.get_text()
+
+    # Mesma coisa, explorei o html e achei esse caminho para pegar os detalhes
+    # Precisa do 'div > ...', pois se não tiver ele pode pegar oustros spans
+    # dentro do span quem tem a data
+    details = info_p1.select_one('div > span:not(.LEwnzc.Sqrs4e)')
+    if details == None:
+        # Pode acontecer de o texto estar diretamente na div (caso do reddit)
+        details = info_p1.get_text()
+    else:
+        details = details.get_text()
+
+    # debug_print(f'{title=}\n{url=}\n{site_name=}\n{date=}\n{details=}')
+    return {
+        'title': title,
+        'url': url,
+        'site_name': site_name,
+        'date': date,
+        'datails': details,
+    }
 
 
 if __name__ == "__main__":
@@ -123,18 +160,15 @@ if __name__ == "__main__":
     req1.raise_for_status()
 
     soup = BeautifulSoup(req1.text, 'html.parser')
-    # Se deve dumpar a pagina html
-    if (parsed_args.dump_html):
-        print(soup)
-        exit(0)
 
     # Explicando esse CSS selector:
     #   #search: busca pelos elementos dentro do elemento que tiver o id 'search'
     #   div.g.Ww4FFb.vt6azd.tF2Cxc.asEBEc: toda div com essa tag contém os links
     #       úteis para a query. Qualuqer coisa que não tenha essa classe é informação
-    #       extra, como vídeos e tals. Achei isso usando o googler e explorando o html de retorno
+    #       extra, como vídeos e tals. Achei isso usando o googler(GoogleParser.parse)
+    #       e explorando o html de retorno
     organic_searches = soup.select('#search div.g.Ww4FFb.vt6azd.tF2Cxc.asEBEc')
-    links = [parse_organic_result(val) for val in organic_searches]
-    for link in links:
-        print(link['href'])
+    organic_results = [parse_organic_result(val) for val in organic_searches]
+    for og_res in organic_results:
+        print(og_res['title'])
 
