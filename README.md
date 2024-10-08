@@ -32,3 +32,5 @@ options:
 # Links úteis
 - https://serpapi.com/blog/google-search-parameters/#:~:text=The%20'oq'%20parameter%20of%20Google,into%20the%20Google%20search%20box.
 - https://seoheronews.com/url-google
+- https://developers.google.com/custom-search/docs/xml_results?hl=en
+- https://github.com/jarun/googler
